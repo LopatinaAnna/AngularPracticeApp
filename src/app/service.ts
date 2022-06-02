@@ -1,11 +1,35 @@
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
 import { Subject } from "rxjs";
+import { map } from 'rxjs/operators';
 
+@Injectable()
 export class Service{
   private characters = [
     { name: 'Luke Skywalker', side: '' },
     { name: 'Darth Vader', side: '' }
   ]
   characterChanged = new Subject<void>()
+  httpClient: HttpClient
+
+  constructor(httpClient: HttpClient){
+    this.httpClient = httpClient
+  }
+
+  fetchCharacters(){
+    this.httpClient.get('https://swapi.dev/api/people')
+      .pipe(map((response: any) => {
+        const characterList = response.results
+        const chars = characterList.map(char => {
+          return { name: char.name, side: '' }
+        })
+        return chars
+      }))
+      .subscribe(data => {
+        this.characters = data
+        this.characterChanged.next()
+      })
+  }
 
   getCharacters(chosenList){
     if (chosenList === 'all') {
