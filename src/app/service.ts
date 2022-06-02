@@ -1,8 +1,11 @@
+import { Subject } from "rxjs";
+
 export class Service{
   private characters = [
     { name: 'Luke Skywalker', side: '' },
     { name: 'Darth Vader', side: '' }
   ]
+  characterChanged = new Subject<void>()
 
   getCharacters(chosenList){
     if (chosenList === 'all') {
@@ -19,6 +22,8 @@ export class Service{
     })
 
     this.characters[index].side = character.side
+
+    this.characterChanged.next()
   }
 
   addCharacter(name, side){
